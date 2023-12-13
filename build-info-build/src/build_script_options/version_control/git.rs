@@ -1,8 +1,5 @@
 use anyhow::{anyhow, Result};
-use build_info_common::{
-	chrono::{TimeZone, Utc},
-	GitInfo,
-};
+use build_info_common::GitInfo;
 use git2::{Oid, Repository, StatusOptions};
 
 pub(crate) fn get_info() -> Result<GitInfo> {
@@ -30,7 +27,6 @@ pub(crate) fn get_info() -> Result<GitInfo> {
 	let commit = head.peel_to_commit()?;
 	let commit_id = commit.id();
 	let commit_short_id = commit.as_object().short_id()?.as_str().unwrap().to_string();
-	let commit_timestamp = Utc.timestamp(commit.time().seconds(), 0);
 
 	let changes = repository.statuses(Some(StatusOptions::new().include_ignored(false)))?;
 	let dirty = !changes.is_empty();
@@ -40,7 +36,6 @@ pub(crate) fn get_info() -> Result<GitInfo> {
 	Ok(GitInfo {
 		commit_id: commit_id.to_string(),
 		commit_short_id,
-		commit_timestamp,
 		dirty,
 		branch: if head.is_branch() {
 			head.shorthand().map(|s| s.to_string())

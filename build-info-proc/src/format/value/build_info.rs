@@ -8,7 +8,6 @@ impl Value for BuildInfo {
 	fn call(&self, func: &str, args: &[Box<dyn Value>]) -> anyhow::Result<Box<dyn Value>> {
 		match func {
 			OP_FIELD_ACCESS => match as_field_name(args) {
-				"timestamp" => Ok(Box::new(self.timestamp)),
 				"profile" => Ok(Box::new(self.profile.clone())),
 				"optimization_level" => Ok(Box::new(self.optimization_level)),
 				"crate_info" => Ok(Box::new(self.crate_info.clone())),

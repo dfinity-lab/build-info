@@ -10,7 +10,6 @@ impl Value for CompilerInfo {
 			OP_FIELD_ACCESS => match as_field_name(args) {
 				"version" => Ok(Box::new(self.version.clone())),
 				"commit_id" => Ok(Box::new(self.commit_id.clone())),
-				"commit_date" => Ok(Box::new(self.commit_date)),
 				"channel" => Ok(Box::new(self.channel)),
 				"host_triple" => Ok(Box::new(self.host_triple.clone())),
 				"target_triple" => Ok(Box::new(self.target_triple.clone())),

@@ -35,11 +35,7 @@ impl std::fmt::Display for crate::CompilerInfo {
 
 		if let Some(ref commit_id) = self.commit_id {
 			let commit_id = &commit_id[0..9];
-			if let Some(ref commit_date) = self.commit_date {
-				write!(f, " ({} {})", commit_id, commit_date)?;
-			} else {
-				write!(f, " ({})", commit_id)?;
-			}
+			write!(f, " ({})", commit_id)?;
 		}
 
 		Ok(())

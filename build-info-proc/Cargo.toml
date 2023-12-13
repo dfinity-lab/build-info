@@ -1,6 +1,6 @@
 [package]
 name = "build-info-proc"
-version = "0.0.26"
+version = "0.0.27"
 authors = ["Daniel Schemmel <daniel@schemmel.net>"]
 edition = "2021"
 publish = ["crates-io"]
@@ -16,7 +16,6 @@ proc-macro = true
 anyhow = "1"
 base64 = "0.13"
 bincode = "1"
-chrono = "0.4"
 num-bigint = "0.4"
 num-traits = "0.2"
 proc-macro2 = "1"
@@ -27,7 +26,7 @@ serde_json = "1"
 syn = "1"
 xz2 = "0.1"
 
-build-info-common = { version = "=0.0.26", path = "../build-info-common", features = ["enable-serde"] }
+build-info-common = { version = "=0.0.27", path = "../build-info-common", features = ["enable-serde"] }
 
 [dev-dependencies]
 pretty_assertions = "1"

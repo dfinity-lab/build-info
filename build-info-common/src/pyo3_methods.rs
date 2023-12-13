@@ -21,24 +21,6 @@ impl BuildInfo {
 		format!("{:?}", self)
 	}
 
-	/// Gets *almost* the timestamp, as Python's `datetime` does not account for leap seconds
-	#[getter]
-	fn timestamp<'py>(&self, py: Python<'py>) -> PyResult<&'py PyAny> {
-		use chrono::{Datelike, Timelike};
-
-		let py_datetime = py.import("datetime")?;
-		py_datetime.getattr("datetime")?.call1((
-			self.timestamp.year_ce().1,
-			self.timestamp.month(),
-			self.timestamp.day(),
-			self.timestamp.hour(),
-			self.timestamp.minute(),
-			self.timestamp.second(),
-			self.timestamp.timestamp_subsec_micros() % 1_000_000,
-			py_datetime.getattr("timezone")?.getattr("utc")?,
-		))
-	}
-
 	#[getter]
 	fn profile(&self) -> &str {
 		&self.profile
@@ -135,20 +117,6 @@ impl CompilerInfo {
 	}
 
 	#[getter]
-	fn commit_date<'py>(&self, py: Python<'py>) -> PyResult<Option<&'py PyAny>> {
-		use chrono::Datelike;
-
-		self
-			.commit_date
-			.map(|ref date| {
-				py.import("datetime")?
-					.getattr("date")?
-					.call1((date.year_ce().1, date.month(), date.day()))
-			})
-			.transpose()
-	}
-
-	#[getter]
 	fn channel(&self) -> CompilerChannel {
 		self.channel
 	}
@@ -182,24 +150,6 @@ impl GitInfo {
 	#[getter]
 	fn commit_short_id(&self) -> &str {
 		&self.commit_short_id
-	}
-
-	/// Gets *almost* the timestamp, as Python's `datetime` does not account for leap seconds
-	#[getter]
-	fn commit_timestamp<'py>(&self, py: Python<'py>) -> PyResult<&'py PyAny> {
-		use chrono::{Datelike, Timelike};
-
-		let py_datetime = py.import("datetime")?;
-		py_datetime.getattr("datetime")?.call1((
-			self.commit_timestamp.year_ce().1,
-			self.commit_timestamp.month(),
-			self.commit_timestamp.day(),
-			self.commit_timestamp.hour(),
-			self.commit_timestamp.minute(),
-			self.commit_timestamp.second(),
-			self.commit_timestamp.timestamp_subsec_micros() % 1_000_000,
-			py_datetime.getattr("timezone")?.getattr("utc")?,
-		))
 	}
 
 	#[getter]

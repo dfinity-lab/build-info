@@ -8,8 +8,6 @@ For example, `build_info_common::BuildInfo` should be used as `build_info::Build
 
 #![forbid(unsafe_code)]
 
-pub use chrono;
-use chrono::{DateTime, NaiveDate, Utc};
 use derive_more::Display;
 pub use semver;
 use semver::Version;
@@ -39,9 +37,6 @@ pub fn crate_version() -> Version {
 #[cfg_attr(feature = "enable-serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct BuildInfo {
-	/// Updated whenever `build.rs` is rerun.
-	pub timestamp: DateTime<Utc>,
-
 	/// Cargo currently supports two different build types: `"Release"` and `"Debug"`
 	pub profile: String,
 
@@ -110,9 +105,6 @@ pub struct CompilerInfo {
 	/// Commit hash from which `rustc` was built
 	pub commit_id: Option<String>,
 
-	/// Date on which `rustc` was built
-	pub commit_date: Option<NaiveDate>,
-
 	/// Channel which was configured for this version of `rustc`
 	pub channel: CompilerChannel,
 
@@ -168,9 +160,6 @@ pub struct GitInfo {
 	/// The length of this string depends on the effective value of the git configuration variable `core.abbrev`, and is
 	/// extended to the minimum length required for the id to be unique (at the time it was computed).
 	pub commit_short_id: String,
-
-	/// Timestamp of the currently checked out commit
-	pub commit_timestamp: DateTime<Utc>,
 
 	/// `true` iff the repository had uncommitted changes when building the project.
 	pub dirty: bool,

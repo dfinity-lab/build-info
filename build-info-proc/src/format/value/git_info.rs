@@ -10,7 +10,6 @@ impl Value for GitInfo {
 			"!field" => match as_field_name(args) {
 				"commit_id" => Ok(Box::new(self.commit_id.clone())),
 				"commit_short_id" => Ok(Box::new(self.commit_short_id.clone())),
-				"commit_timestamp" => Ok(Box::new(self.commit_timestamp)),
 				"dirty" => Ok(Box::new(self.dirty)),
 				"branch" => Ok(Box::new(self.branch.clone())),
 				"tags" => Ok(Box::new(self.tags.clone())),
