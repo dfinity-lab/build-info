@@ -16,7 +16,6 @@ pub(crate) enum Type {
 	GitInfo,
 
 	Version,
-	DateTimeUtc,
 
 	Option,
 	Vec,
@@ -40,7 +39,6 @@ impl fmt::Display for Type {
 			Type::GitInfo => write!(f, "build_info::GitInfo"),
 
 			Type::Version => write!(f, "build_info::semver::Version"),
-			Type::DateTimeUtc => write!(f, "build_info::chrono::DateTime<build_info::chrono::Utc>"),
 
 			Type::Option => write!(f, "Option<_>"),
 			Type::Vec => write!(f, "Vec<_>"),

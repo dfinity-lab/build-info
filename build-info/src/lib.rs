@@ -5,7 +5,7 @@
 #[cfg(feature = "runtime")]
 pub use build_info_common::{
 	BuildInfo, CompilerChannel, CompilerInfo, CpuInfo, CrateInfo, Endianness, GitInfo, OptimizationLevel, TargetInfo,
-	VersionControl, chrono, semver,
+	VersionControl, semver,
 };
 /// This crate defines macro_rules that pass `$crate` (i.e., this crate) to the proc-macros doing the actual work
 /// The proc-macro crate that contains said proc-macros is reexported here, to be found in the macro_rules.
@@ -28,8 +28,8 @@ Generates a string at compile-time that includes build information.
 
 This function-like macro takes a single string-literal as its argument, on which it performs string interpolation with
 the current build information. To do so, you can use a subset of the normal format language, with the special
-"variable" `$` that denotes the `BuildInfo` object. For example, `build_info::format!("Built at {}", $.timestamp)`
-might return "Built at 2020-05-28 20:09:40Z".`
+"variable" `$` that denotes the `BuildInfo` object. For example, `build_info::format!("Compiled with {}", $.compiler)`
+might return "Compiled with rustc 1.97.1".`
 
 You can use `?` to unwrap `Option`s and some additional types can be formatted this way (e.g., `Vec<T>`).
 

@@ -1,8 +1,6 @@
 use core::sync::atomic::{AtomicBool, Ordering};
-use std::path::{Path, PathBuf};
 
 use build_info_common::{OptimizationLevel, VersionedString};
-use chrono::{DateTime, Utc};
 
 pub use self::crate_info::DependencyDepth;
 use super::BuildInfo;
@@ -10,21 +8,12 @@ use super::BuildInfo;
 mod compiler;
 mod crate_info;
 mod target;
-mod timestamp;
 mod version_control;
-
-pub fn cargo_toml() -> &'static Path {
-	static CARGO_TOML: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
-	CARGO_TOML.get_or_init(|| Path::new(&std::env::var_os("CARGO_MANIFEST_DIR").unwrap()).join("Cargo.toml"))
-}
 
 /// Type to store any (optional) options for the build script.
 pub struct BuildScriptOptions {
 	/// Stores if the build info has already been generated
 	consumed: bool,
-
-	/// Use this as the build timestamp, if set.
-	timestamp: Option<DateTime<Utc>>,
 
 	/// Enable runtime dependency collection
 	collect_runtime_dependencies: DependencyDepth,
@@ -59,20 +48,10 @@ impl BuildScriptOptions {
 
 		let compiler = compiler::get_info();
 		let target = target::get_info();
-		let crate_info::Manifest {
-			crate_info,
-			workspace_root,
-		} = crate_info::read_manifest(
-			&target.triple,
-			self.collect_runtime_dependencies,
-			self.collect_build_dependencies,
-			self.collect_dev_dependencies,
-		);
+		let crate_info = crate_info::read_crate_info();
 		let version_control = version_control::get_info();
 
-		let timestamp = self.timestamp.unwrap_or_else(timestamp::get_timestamp);
 		let build_info = BuildInfo {
-			timestamp,
 			profile,
 			optimization_level,
 			crate_info,
@@ -95,7 +74,7 @@ impl BuildScriptOptions {
 		// Whenever any `cargo:rerun-if-changed` key is set, the default set is cleared.
 		// Since we will need to emit such keys to trigger rebuilds when the vcs repository changes state,
 		// we also have to emit the customary triggers again, or we will only be rerun in that exact case.
-		rebuild_if_project_changes(&workspace_root);
+		rebuild_if_project_changes();
 
 		build_info
 	}
@@ -120,7 +99,6 @@ impl Default for BuildScriptOptions {
 
 		Self {
 			consumed: false,
-			timestamp: None,
 			collect_runtime_dependencies: DependencyDepth::None,
 			collect_build_dependencies: DependencyDepth::None,
 			collect_dev_dependencies: DependencyDepth::None,
@@ -137,17 +115,11 @@ impl Drop for BuildScriptOptions {
 }
 
 /// Emits a `cargo:rerun-if-changed` line for each file in the target project.
-/// By default, the following files are included:
-/// - `Cargo.toml`
-/// - `$workspace_root/Cargo.lock`
-/// - Any file that ends in `.rs`
-fn rebuild_if_project_changes(workspace_root: &str) {
-	println!("cargo:rerun-if-changed={}", cargo_toml().to_str().unwrap());
-	println!(
-		"cargo:rerun-if-changed={}",
-		Path::new(workspace_root).join("Cargo.lock").to_str().unwrap()
-	);
-
+///
+/// Only `*.rs` files are included. Unlike upstream, `Cargo.toml` and the workspace `Cargo.lock` are intentionally NOT
+/// emitted: in a large monorepo those trigger rebuilds of every build-info consumer on any manifest/lockfile change,
+/// and under sandboxed build systems (e.g. Bazel) their absolute paths are not meaningful anyway.
+fn rebuild_if_project_changes() {
 	for source in glob::glob_with(
 		"**/*.rs",
 		glob::MatchOptions {

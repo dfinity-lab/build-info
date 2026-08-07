@@ -1,8 +1,5 @@
 use anyhow::{Context, Result, anyhow};
-use build_info_common::{
-	GitInfo,
-	chrono::{TimeZone, Utc},
-};
+use build_info_common::GitInfo;
 use git2::{Oid, Repository, StatusOptions};
 
 pub(crate) fn get_info() -> Result<GitInfo> {
@@ -33,14 +30,6 @@ pub(crate) fn get_info() -> Result<GitInfo> {
 	let commit = head.peel_to_commit()?;
 	let commit_id = commit.id();
 	let commit_short_id = commit.as_object().short_id()?.as_str().unwrap().to_string();
-	let commit_timestamp = match Utc.timestamp_opt(commit.time().seconds(), 0) {
-		chrono::LocalResult::None => panic!("Invalid commit timestamp: {:?}", commit.time()),
-		chrono::LocalResult::Single(timestamp) => timestamp,
-		chrono::LocalResult::Ambiguous(min, max) => panic!(
-			"Ambiguous timestamp: {:?} could refer to {min} or {max}. This should never occur for UTC!",
-			commit.time()
-		),
-	};
 
 	let changes = repository.statuses(Some(StatusOptions::new().include_ignored(false)))?;
 	let dirty = !changes.is_empty();
@@ -50,7 +39,6 @@ pub(crate) fn get_info() -> Result<GitInfo> {
 	Ok(GitInfo {
 		commit_id: commit_id.to_string(),
 		commit_short_id,
-		commit_timestamp,
 		dirty,
 		branch: if head.is_branch() {
 			head.shorthand().ok().map(|s| s.to_string())

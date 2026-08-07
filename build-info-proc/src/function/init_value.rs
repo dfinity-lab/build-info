@@ -1,7 +1,6 @@
 //! Not currently enabled.
 
 use build_info_common::{
-	chrono::{DateTime, Datelike, NaiveDate, Utc},
 	semver::Version,
 	BuildInfo, CompilerChannel, CompilerInfo, CpuInfo, CrateInfo, Endianness, GitInfo, OptimizationLevel, TargetInfo,
 	VersionControl,
@@ -21,10 +20,6 @@ impl InitValue for BuildInfo {
 	fn init_value(&self, tokens: &mut TokenStream, definition_crate: &Ident) {
 		tokens.append_all(quote_spanned!(proc_macro::Span::mixed_site().into() => #definition_crate::BuildInfo));
 		let mut initializer = TokenStream::new();
-
-		initializer.append_all(quote!(timestamp:));
-		init_value(&self.timestamp, &mut initializer, definition_crate);
-		initializer.append_all(quote!(,));
 
 		initializer.append_all(quote!(profile:));
 		init_value(&self.profile, &mut initializer, definition_crate);
@@ -185,10 +180,6 @@ impl InitValue for CompilerInfo {
 		init_value(&self.commit_id, &mut initializer, definition_crate);
 		initializer.append_all(quote!(,));
 
-		initializer.append_all(quote!(commit_date:));
-		init_value(&self.commit_date, &mut initializer, definition_crate);
-		initializer.append_all(quote!(,));
-
 		initializer.append_all(quote!(channel:));
 		init_value(&self.channel, &mut initializer, definition_crate);
 		initializer.append_all(quote!(,));
@@ -277,10 +268,6 @@ impl InitValue for GitInfo {
 		init_value(&self.commit_short_id, &mut initializer, definition_crate);
 		initializer.append_all(quote!(,));
 
-		initializer.append_all(quote!(commit_timestamp:));
-		init_value(&self.commit_timestamp, &mut initializer, definition_crate);
-		initializer.append_all(quote!(,));
-
 		initializer.append_all(quote!(dirty:));
 		init_value(&self.dirty, &mut initializer, definition_crate);
 		initializer.append_all(quote!(,));
@@ -302,26 +289,6 @@ impl InitValue for Version {
 		let version_string = self.to_string();
 		tokens.append_all(quote_spanned!(proc_macro::Span::mixed_site().into() =>
 			#definition_crate::semver::Version::parse(#version_string).unwrap()
-		));
-	}
-}
-
-impl InitValue for DateTime<Utc> {
-	fn init_value(&self, tokens: &mut TokenStream, definition_crate: &Ident) {
-		let nanos = self.timestamp_nanos_opt().unwrap();
-		tokens.append_all(quote_spanned!(proc_macro::Span::mixed_site().into() =>
-			#definition_crate::chrono::TimeZone::timestamp_nanos(&#definition_crate::chrono::Utc, #nanos)
-		));
-	}
-}
-
-impl InitValue for NaiveDate {
-	fn init_value(&self, tokens: &mut TokenStream, definition_crate: &Ident) {
-		let year = self.year();
-		let month = self.month();
-		let day = self.day();
-		tokens.append_all(quote_spanned!(proc_macro::Span::mixed_site().into() =>
-			#definition_crate::chrono::NaiveDate::from_ymd_opt(#year, #month, #day).unwrap()
 		));
 	}
 }
