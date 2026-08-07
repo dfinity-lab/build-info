@@ -12,12 +12,9 @@ rust-version.workspace = true
 
 [dependencies]
 anyhow = "1"
-cargo_metadata = "0.23.0"
-chrono = { version = "0.4.23", default-features = false, features = ["clock"] }
 ciborium = "0.2.2"
 git2 = { version = "0.21.0", default-features = false, optional = true }
 glob = "0.3"
-pretty_assertions = "1"
 rustc_version = "0.4"
 serde_json = "1"
 z85 = "3.0.6"

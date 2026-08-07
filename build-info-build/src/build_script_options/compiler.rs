@@ -1,5 +1,4 @@
 use build_info_common::{CompilerChannel, CompilerInfo, semver::Version};
-use chrono::NaiveDate;
 use rustc_version::{Channel, version_meta};
 
 pub(crate) fn get_info() -> CompilerInfo {
@@ -16,14 +15,9 @@ pub(crate) fn get_info() -> CompilerInfo {
 		Channel::Dev => CompilerChannel::Dev,
 	};
 
-	let commit_date = rustc_version
-		.commit_date
-		.and_then(|date| NaiveDate::parse_from_str(&date, "%Y-%m-%d").ok());
-
 	CompilerInfo {
 		version,
 		commit_id: rustc_version.commit_hash,
-		commit_date,
 		channel,
 		host_triple: rustc_version.host,
 	}

@@ -16,7 +16,6 @@ mod option;
 mod string;
 mod vec;
 
-mod chrono;
 mod semver;
 
 mod build_info;
