@@ -116,9 +116,9 @@ pub struct CpuInfo {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Display, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum Endianness {
-	/// Big endian CPUs store numbers least significant byte first. E.g., `0xAB` is stored as `[0xA, 0xB]`.
+	/// Big endian CPUs store the most significant byte first. E.g., `0xABCDu16` is stored as `[0xAB, 0xCD]`.
 	Big,
-	/// Big endian CPUs store numbers most significant byte first. E.g., `0xAB` is stored as `[0xB, 0xA]`.
+	/// Little endian CPUs store the least significant byte first. E.g., `0xABCDu16` is stored as `[0xCD, 0xAB]`.
 	Little,
 }
 
