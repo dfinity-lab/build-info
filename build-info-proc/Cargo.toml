@@ -3,7 +3,7 @@ authors = ["Daniel Schemmel <daniel@schemmel.net>"]
 description = "Part of the build-info crate: This crate provides the proc-macros."
 name = "build-info-proc"
 readme = "../README.md"
-version = "0.0.45"
+version = "0.0.47"
 
 edition.workspace = true
 license.workspace = true
@@ -15,17 +15,17 @@ proc-macro = true
 
 [dependencies]
 ciborium = "0.2.2"
-manyhow = "0.11.4"
+manyhow = "0.14.1"
 num-bigint = "0.5.1"
 num-traits = "0.2"
 proc-macro2 = "1"
 quote = "1"
 serde_json = "1"
-syn = { version = "2", features = ["full"] }
+syn = { version = "3.0.3", features = ["full"] }
 z85 = "3.0.6"
-zstd = "0.13"
+zstd = "0.14.0"
 
-build-info-common = { version = "=0.0.45", path = "../build-info-common", features = ["serde"] }
+build-info-common = { version = "=0.0.47", path = "../build-info-common", features = ["serde"] }
 
 [dev-dependencies]
 pretty_assertions = "1"

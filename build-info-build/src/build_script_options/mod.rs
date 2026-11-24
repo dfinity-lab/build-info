@@ -1,5 +1,6 @@
 use core::sync::atomic::{AtomicBool, Ordering};
 
+use anyhow::Context;
 use build_info_common::{OptimizationLevel, VersionedString};
 
 pub use self::crate_info::DependencyDepth;
@@ -74,7 +75,7 @@ impl BuildScriptOptions {
 		// Whenever any `cargo:rerun-if-changed` key is set, the default set is cleared.
 		// Since we will need to emit such keys to trigger rebuilds when the vcs repository changes state,
 		// we also have to emit the customary triggers again, or we will only be rerun in that exact case.
-		rebuild_if_project_changes();
+		rebuild_if_project_changes().unwrap();
 
 		build_info
 	}
@@ -119,7 +120,7 @@ impl Drop for BuildScriptOptions {
 /// Only `*.rs` files are included. Unlike upstream, `Cargo.toml` and the workspace `Cargo.lock` are intentionally NOT
 /// emitted: in a large monorepo those trigger rebuilds of every build-info consumer on any manifest/lockfile change,
 /// and under sandboxed build systems (e.g. Bazel) their absolute paths are not meaningful anyway.
-fn rebuild_if_project_changes() {
+fn rebuild_if_project_changes() -> anyhow::Result<()> {
 	for source in glob::glob_with(
 		"**/*.rs",
 		glob::MatchOptions {
@@ -128,9 +129,21 @@ fn rebuild_if_project_changes() {
 			require_literal_leading_dot: false,
 		},
 	)
-	.unwrap()
-	.map(|source| source.unwrap())
+	.with_context(|| "Error enumerating source files")?
 	{
-		println!("cargo:rerun-if-changed={}", source.to_str().unwrap());
+		match source {
+			Ok(source) => {
+				if let Some(source) = source.to_str() {
+					println!("cargo:rerun-if-changed={}", source);
+				} else {
+					return Err(anyhow::anyhow!("Source file path {source:?} is not valid UTF-8"));
+				}
+			}
+			Err(err) => {
+				println!("cargo::warning=file system error while enumerating source files: {err}");
+			}
+		}
 	}
+
+	Ok(())
 }

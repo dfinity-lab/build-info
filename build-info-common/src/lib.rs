@@ -1,10 +1,8 @@
-/*!
-Common types used by the `build-info` and `build-info-build` crates.
-
-User code should not depend on this crate directly, but rather depend on `build-info` (as a `[dependency]`) and `build-info-build` (as a `[build-dependency]`).
-The types provided herein are reexported by `build-info` and should be used that way.
-For example, `build_info_common::BuildInfo` should be used as `build_info::BuildInfo` instead.
-*/
+//! Common types used by the `build-info` and `build-info-build` crates.
+//!
+//! User code should not depend on this crate directly, but rather depend on `build-info` (as a `[dependency]`) and
+//! `build-info-build` (as a `[build-dependency]`). The types provided herein are reexported by `build-info` and should
+//! be used that way. For example, `build_info_common::BuildInfo` should be used as `build_info::BuildInfo` instead.
 
 #![forbid(unsafe_code)]
 
@@ -118,7 +116,9 @@ pub struct CpuInfo {
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Display, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum Endianness {
+	/// Big endian CPUs store the most significant byte first. E.g., `0xABCDu16` is stored as `[0xAB, 0xCD]`.
 	Big,
+	/// Little endian CPUs store the least significant byte first. E.g., `0xABCDu16` is stored as `[0xCD, 0xAB]`.
 	Little,
 }
 
@@ -165,12 +165,10 @@ impl VersionControl {
 	}
 }
 
-/**
-Information about a git repository
-
-If a git repository is detected (and, thereby, this information included), the build script will be rerun whenever the
-currently checked out commit changes.
-*/
+/// Information about a git repository
+///
+/// If a git repository is detected (and, thereby, this information included), the build script will be rerun whenever
+/// the currently checked out commit changes.
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct GitInfo {
